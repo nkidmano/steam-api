@@ -1,10 +1,23 @@
+// Require package
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
+const admin = require('firebase-admin');
+const serviceAccount = require('./serviceAccountKey.json');
 
+// Init app
 const app = express();
 
+// Enable CORS
 app.use(cors());
+
+// Init Firebase
+const firebase = admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: 'https://steam-api-546bc.firebaseio.com',
+});
+
+const firebaseDB = firebase.database();
 
 async function fetchGames() {
   try {
