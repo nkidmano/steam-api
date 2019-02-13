@@ -7,21 +7,26 @@ const app = express();
 app.use(cors());
 
 async function fetchGames() {
-  const { data: ids } = await axios.get(
-    'https://api.steampowered.com/ISteamApps/GetAppList/v2/'
-  );
-
-  const { apps } = ids.applist;
-
-  for (let i = 0; i < 10; i++) {
-    const { data: games } = await axios.get(
-      `https://store.steampowered.com/api/appdetails?appids=${apps[i]['appid']}`
+  try {
+    const { data } = await axios.get(
+      'https://api.steampowered.com/ISteamApps/GetAppList/v2/'
     );
 
-    const result = data[Object.keys(data)[0]];
-    if (result['success']) {
-      console.log(games);
+    const { apps } = data.applist;
+
+    for (let i = 0; i < 4; i++) {
+      const { data } = await axios.get(
+        `https://store.steampowered.com/api/appdetails?appids=${
+          apps[i]['appid']
+        }`
+      );
+
+      if (data[Object.keys(data)[0]]['success']) {
+        console.log(data);
+      }
     }
+  } catch (e) {
+    console.error(e);
   }
 }
 
