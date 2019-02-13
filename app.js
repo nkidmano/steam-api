@@ -12,12 +12,15 @@ const app = express();
 app.use(cors());
 
 // Init Firebase
-const firebase = admin.initializeApp({
+admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: 'https://steam-api-546bc.firebaseio.com',
 });
 
-const firebaseDB = firebase.database();
+// Init Firebase database
+const db = admin.database();
+const dbRef = db.ref('/');
+const gameRef = dbRef.child('games');
 
 async function fetchGames() {
   try {
@@ -27,7 +30,7 @@ async function fetchGames() {
 
     const { apps } = data.applist;
 
-    for (let i = 0; i < 4; i++) {
+    for (let i = 500; i < 700; i++) {
       const { data } = await axios.get(
         `https://store.steampowered.com/api/appdetails?appids=${
           apps[i]['appid']
@@ -35,7 +38,11 @@ async function fetchGames() {
       );
 
       if (data[Object.keys(data)[0]]['success']) {
-        console.log(data);
+        let key = apps[i]['appid'];
+
+        gameRef.child(key).set({
+          ...data[Object.keys(data)[0]]['data'],
+        });
       }
     }
   } catch (e) {
